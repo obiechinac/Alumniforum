@@ -42,7 +42,7 @@ public class APIException extends RuntimeException {
         this.errors = errors;
     }
     public APIException(HttpStatus status, String message) {
-        super();
+        super(message);
         this.status = status;
         this.message = message;
     }

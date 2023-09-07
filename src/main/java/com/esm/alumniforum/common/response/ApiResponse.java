@@ -11,7 +11,8 @@ import java.io.Serializable;
 @Builder
 @JsonPropertyOrder({
         "success",
-        "message"
+        "message",
+        "status"
 })
 public class ApiResponse implements Serializable {
     @JsonIgnore
@@ -22,21 +23,30 @@ public class ApiResponse implements Serializable {
     @JsonProperty("message")
     private String message;
 
-    @JsonIgnore
-    private HttpStatus status;
+    @JsonProperty("status")
+    private int status;
 
     public ApiResponse() {
 
     }
 
+    public ApiResponse(Boolean success, String message, int status) {
+        this.success = success;
+        this.message = message;
+        this.status=status;
+    }
+
     public ApiResponse(Boolean success, String message) {
         this.success = success;
         this.message = message;
+
     }
 
-    public ApiResponse(Boolean success, String message, HttpStatus httpStatus) {
-        this.success = success;
-        this.message = message;
-        this.status = httpStatus;
+    @Override
+    public String toString() {
+        return "ApiResponse{" +
+                "success=" + success +
+                ", message='" + message + '\'' +
+                '}';
     }
 }

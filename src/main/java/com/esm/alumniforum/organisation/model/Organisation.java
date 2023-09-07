@@ -1,13 +1,15 @@
 package com.esm.alumniforum.organisation.model;
 
 import com.esm.alumniforum.common.entity.PersistCommon;
+import com.esm.alumniforum.enums.OrganisationType;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.util.UUID;
 
 @Entity
-@Table(schema = "organisation")
+@Table(name = "organisation")
 @Getter
 @Setter
 @Builder
@@ -15,11 +17,8 @@ import java.util.Date;
 @AllArgsConstructor
 public class Organisation extends PersistCommon {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "org_sequence")
-    @SequenceGenerator(name = "org_sequence", sequenceName = "org_sequence")
     @Column(name = "id", nullable = false)
     private String id;
-
     @Column(name = "org_name")
     private String orgName ;
     @Column(name = "description")
@@ -34,12 +33,20 @@ public class Organisation extends PersistCommon {
     private String  email;
     @Column(name = "phone")
     private String  phone;
-
     @Column(name = "is_deleted")
     private Boolean  isDeleted;
+    @Column(name = "is_active")
+    private Boolean  isActive;
+    @Column(name = "org_type")
+    @Enumerated(EnumType.STRING)
+    private OrganisationType organisationType;
+    private String  country;
+    @Column(name = "established_date")
+    private LocalDate establishedDate;
     @PrePersist
     private void generateId() {
-        this.id = "ORG_" + this.id;
+        String uuidString = UUID.randomUUID().toString();
+        id = "ORG-" + uuidString;
     }
 
     @Override

@@ -2,11 +2,13 @@ package com.esm.alumniforum.organisation.dto;
 
 import lombok.*;
 
+import java.time.LocalDate;
+
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
 @Setter
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class OrganisationResponse {
     private String  orgName ;
     private String  description;
@@ -15,5 +17,6 @@ public class OrganisationResponse {
     private String  address;
     private String  email;
     private String  phone;
-    private String  createdDate;
+    private LocalDate createdDate;
+    private String id;
 }

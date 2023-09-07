@@ -4,8 +4,7 @@ import com.esm.alumniforum.common.response.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value = HttpStatus.NOT_FOUND)
-
+//@ResponseStatus(value = HttpStatus.NOT_FOUND)
 public class ResourceNotFoundException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
@@ -16,10 +15,13 @@ public class ResourceNotFoundException extends RuntimeException {
     private Object fieldValue;
 
     public ResourceNotFoundException(String resourceName, String fieldName, Object fieldValue) {
-        super();
+        super(String.format("%s not found with %s: '%s'", resourceName, fieldName, fieldValue));
         this.resourceName = resourceName;
         this.fieldName = fieldName;
         this.fieldValue = fieldValue;
+
+
+
     }
 
     public String getResourceName() {
@@ -43,5 +45,15 @@ public class ResourceNotFoundException extends RuntimeException {
     private void setApiResponse() {
         String message = String.format("%s not found with %s: '%s'", resourceName, fieldName, fieldValue);
         apiResponse = new ApiResponse(Boolean.FALSE, message);
+    }
+
+    @Override
+    public String toString() {
+        return "ResourceNotFoundException{" +
+                "apiResponse=" + apiResponse +
+                ", resourceName='" + resourceName + '\'' +
+                ", fieldName='" + fieldName + '\'' +
+                ", fieldValue=" + fieldValue +
+                '}';
     }
 }
