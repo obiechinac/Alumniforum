@@ -77,7 +77,7 @@ public class ActivityController {
     @GetMapping("unpaid/myorg/all")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> findAllUnpaidByMyPageable(@RequestParam(name = "page", required = false, defaultValue = Constant.DEFAULT_PAGE_NUMBER) int page,
-                                                 @RequestParam(name = "size", required = false, defaultValue = Constant.DEFAULT_PAGE_SIZE) int size, UserPrincipal principal){
+                                                 @RequestParam(name = "size", required = false, defaultValue = Constant.DEFAULT_PAGE_SIZE) int size, @CurrentUser UserPrincipal principal){
         HttpHeaders headers = new HttpHeaders();
         PageRequest pageRequest = PageRequest.of(page,size);
         return new ResponseEntity<>(activityService.findAllUnpaidByMyOrg(pageRequest,principal.getOrganisation().getId()), headers, HttpStatus.OK);
@@ -94,7 +94,7 @@ public class ActivityController {
     @GetMapping("voluntary/myorg/all")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> findAllVoluntaryByMyOrgPageable(@RequestParam(name = "page", required = false, defaultValue = Constant.DEFAULT_PAGE_NUMBER) int page,
-                                                 @RequestParam(name = "size", required = false, defaultValue = Constant.DEFAULT_PAGE_SIZE) int size, UserPrincipal principal){
+                                                 @RequestParam(name = "size", required = false, defaultValue = Constant.DEFAULT_PAGE_SIZE) int size, @CurrentUser UserPrincipal principal){
         HttpHeaders headers = new HttpHeaders();
         PageRequest pageRequest = PageRequest.of(page,size);
         return new ResponseEntity<>(activityService.findAllVoluntaryByMyOrg(pageRequest,principal.getOrganisation().getId()), headers, HttpStatus.OK);
@@ -111,7 +111,7 @@ public class ActivityController {
     @GetMapping("compulsory/myorg/all")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> findAllCompulsoryByMyOrgPageable(@RequestParam(name = "page", required = false, defaultValue = Constant.DEFAULT_PAGE_NUMBER) int page,
-                                                     @RequestParam(name = "size", required = false, defaultValue = Constant.DEFAULT_PAGE_SIZE) int size, UserPrincipal principal){
+                                                     @RequestParam(name = "size", required = false, defaultValue = Constant.DEFAULT_PAGE_SIZE) int size, @CurrentUser UserPrincipal principal){
         HttpHeaders headers = new HttpHeaders();
         PageRequest pageRequest = PageRequest.of(page,size);
         return new ResponseEntity<>(activityService.findAllCompulsoryByMyOrg(pageRequest,principal.getOrganisation().getId()), headers, HttpStatus.OK);

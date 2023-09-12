@@ -1,7 +1,5 @@
 package com.esm.alumniforum.member.controller;
 
-import com.esm.alumniforum.activity.dto.ActivityForm;
-import com.esm.alumniforum.activity.dto.ActivityResponse;
 import com.esm.alumniforum.constant.Constant;
 import com.esm.alumniforum.exceptions.ResourceNotFoundException;
 import com.esm.alumniforum.member.dto.MemberForm;
@@ -30,7 +28,12 @@ public class MemberController {
 
     return new ResponseEntity<>(this.memberService.save(memberForm, principal), HttpStatus.CREATED);
 }
+    @PostMapping("create")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<MemberResponse> memberToUser(@RequestBody MemberForm memberForm, @CurrentUser UserPrincipal principal){
 
+        return new ResponseEntity<>(this.memberService.save(memberForm, principal), HttpStatus.CREATED);
+    }
     @PostMapping("update")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> update(@RequestBody MemberForm memberForm, @CurrentUser UserPrincipal principal){
@@ -77,10 +80,10 @@ public class MemberController {
         return new ResponseEntity<>(memberService.findAllByOrg(pageRequest,orgId), headers, HttpStatus.OK);
     }
 
-    @GetMapping("all")
+    @GetMapping("myorg/all")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> findAllByMyPageable(@RequestParam(name = "page", required = false, defaultValue = Constant.DEFAULT_PAGE_NUMBER) int page,
-                                             @RequestParam(name = "size", required = false, defaultValue = Constant.DEFAULT_PAGE_SIZE) int size, UserPrincipal principal){
+                                             @RequestParam(name = "size", required = false, defaultValue = Constant.DEFAULT_PAGE_SIZE) int size, @CurrentUser UserPrincipal principal){
         HttpHeaders headers = new HttpHeaders();
         PageRequest pageRequest = PageRequest.of(page,size);
         return new ResponseEntity<>(memberService.findAllByMyOrg(pageRequest,principal.getOrganisation().getId()), headers, HttpStatus.OK);

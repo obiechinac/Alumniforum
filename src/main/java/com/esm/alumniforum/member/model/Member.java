@@ -2,6 +2,7 @@ package com.esm.alumniforum.member.model;
 
 import com.esm.alumniforum.common.entity.PersistCommon;
 import com.esm.alumniforum.organisation.model.Organisation;
+import com.esm.alumniforum.user.model.Users;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -38,6 +39,10 @@ public class Member extends PersistCommon {
     private Organisation organisation;
     @Column(name = "is_deleted")
     private Boolean isDeleted;
+
+   @OneToOne
+   @JoinColumn(name = "users_id")
+   private Users users;
 
     @PrePersist
     private void generateId() {

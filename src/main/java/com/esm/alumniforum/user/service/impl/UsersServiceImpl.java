@@ -4,9 +4,11 @@ import com.esm.alumniforum.common.response.PagedResponse;
 import com.esm.alumniforum.constant.Constant;
 import com.esm.alumniforum.exceptions.BadRequestException;
 import com.esm.alumniforum.exceptions.ResourceNotFoundException;
+import com.esm.alumniforum.member.dto.MemberResponse;
+import com.esm.alumniforum.member.model.Member;
+import com.esm.alumniforum.member.repository.MemberRepository;
 import com.esm.alumniforum.organisation.model.Organisation;
 import com.esm.alumniforum.organisation.repository.OrganisationRepository;
-import com.esm.alumniforum.security.CurrentUser;
 import com.esm.alumniforum.security.UserPrincipal;
 import com.esm.alumniforum.user.dto.*;
 import com.esm.alumniforum.user.model.Profile;
@@ -38,9 +40,11 @@ public class UsersServiceImpl implements UsersService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private ProfileRepository profileRepository;
-
     @Autowired
     private OrganisationRepository organisationRepository;
+    @Autowired
+    private MemberRepository memberRepository;
+
     @Override
     public UsersResponse save(UsersForm usersForm, UserPrincipal principal) {
         if (this.usersRepository.existsByEmail(usersForm.getEmail())) {
@@ -56,7 +60,7 @@ public class UsersServiceImpl implements UsersService {
         users.setCreatedBy(principal.getEmail());
         users.setCreatedDate(LocalDate.now());
         Users savedUser = this.usersRepository.save(users);
-        UsersResponse response = modelMapper.map(savedUser,UsersResponse.class);;
+        UsersResponse response = modelMapper.map(savedUser,UsersResponse.class);
         response.setOrgId(savedUser.getOrganisation().getId());
         response.setOrgName(savedUser.getOrganisation().getOrgName());
         response.setProfileResponse(modelMapper.map(savedUser.getProfile(),ProfileResponse.class));
@@ -124,6 +128,73 @@ public class UsersServiceImpl implements UsersService {
     public boolean existsByEmail(String email) {
         return this.usersRepository.existsByEmail(email);
     }
+
+    @Override
+    public MemberResponse userToMember(UserToMemberForm form, String createdBy) {
+        Users users = this.usersRepository.findById(form.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException(MSG, "id", form.getUserId()));
+        Member member = new Member();
+        member.setAddress(users.getProfile() != null ? users.getProfile().getAddress() : form.getAddress());
+        member.setIsDeleted(false);
+        member.setOrganisation(users.getOrganisation());
+        member.setCreatedBy(createdBy);
+        member.setCreatedDate(LocalDate.now());
+        member.setDateJoined(form.getDateJoined());
+        member.setFirstName(users.getProfile() != null ? users.getProfile().getFirstName() : form.getFirstName());
+        member.setLastName(users.getProfile() != null ? users.getProfile().getLastName() : form.getLastName());
+        member.setOtherName(users.getProfile() != null ? users.getProfile().getOtherName() : form.getOtherName());
+        member.setProfilePictureUrl(users.getProfile() != null ? users.getProfile().getProfilePictureUrl() : form.getProfilePictureUrl());
+        member.setUsers(users);
+        Member savedMem = this.memberRepository.save(member);
+        return new ModelMapper().map(savedMem, MemberResponse.class);
+    }
+
+    @Override
+    public UsersResponse memberToUser(MemberToUserForm form, UserPrincipal principal) {
+        Member member = this.memberRepository.findById(form.getMemberId()).orElseThrow(() -> new ResourceNotFoundException("Member not found with ","id", form.getMemberId()));
+        if (this.usersRepository.existsByEmail(form.getEmail())) {
+            throw new BadRequestException("Email is already taken, choose another");
+        }
+        Users users = new Users();
+        String password = passwordEncoder.encode(users.getPassword());
+        users.setPassword(password);
+        users.setOrganisation(principal.getOrganisation());
+        users.setIsDeleted(false);
+        users.setCreatedBy(principal.getEmail());
+        users.setCreatedDate(LocalDate.now());
+
+        Users savedUser = this.usersRepository.save(users);
+        member.setUsers(savedUser);
+
+        Profile profile = new Profile();
+        profile.setProfilePictureUrl(member.getProfilePictureUrl());
+        profile.setAddress(member.getAddress());
+        profile.setFirstName(member.getFirstName());
+        profile.setOtherName(member.getOtherName());
+        profile.setFirstName(member.getFirstName());
+        profileRepository.save(profile);
+        return new ModelMapper().map(users,UsersResponse.class);
+    }
+
+
+//    @Override
+//    public MemberResponse userToMyMember(UserToMemberForm form, UserPrincipal principal) {
+//        Users users = this.usersRepository.findById(form.getUserId()).orElseThrow(() -> new ResourceNotFoundException(MSG,"id", form.getUserId()));
+//        Member member = new Member();
+//        member.setAddress(users.getProfile().getAddress());
+//        member.setIsDeleted(false);
+//        member.setOrganisation(users.getOrganisation());
+//        member.setCreatedBy(principal.getEmail());
+//        member.setCreatedDate(LocalDate.now());
+//        member.setDateJoined(form.getDateJoined());
+//        member.setFirstName(users.getProfile().getFirstName());
+//        member.setLastName(users.getProfile().getLastName());
+//        member.setOtherName(users.getProfile().getOtherName());
+//        member.setProfilePictureUrl(users.getProfile().getProfilePictureUrl());
+//
+//        Member savedMem = this.memberRepository.save(member);
+//        return new ModelMapper().map(savedMem, MemberResponse.class);
+//    }
 
     public PagedResponse<UsersResponse> getPagedResponse(int page, int size, Page<Users> users){
 

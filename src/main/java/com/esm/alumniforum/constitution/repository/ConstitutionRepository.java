@@ -20,4 +20,6 @@ public interface ConstitutionRepository extends JpaRepository<Constitution, Stri
 
     @Query("FROM Constitution where organisation.id =:orgId and isDeleted=false ")
     List<Constitution> findAllByOrg(@Param("orgId") String orgId);
+    @Query("FROM Constitution where organisation.id =:orgId and isDeleted=false ")
+    List<Constitution> findAllByMyOrg(@Param("orgId") String orgId);
 }

@@ -4,12 +4,10 @@ import com.esm.alumniforum.constant.Constant;
 import com.esm.alumniforum.exceptions.BadRequestException;
 import com.esm.alumniforum.exceptions.ResourceNotFoundException;
 import com.esm.alumniforum.exceptions.UnauthorizedException;
+import com.esm.alumniforum.member.dto.MemberResponse;
 import com.esm.alumniforum.security.CurrentUser;
 import com.esm.alumniforum.security.UserPrincipal;
-import com.esm.alumniforum.user.dto.ImageForm;
-import com.esm.alumniforum.user.dto.ProfileForm;
-import com.esm.alumniforum.user.dto.UsersForm;
-import com.esm.alumniforum.user.dto.UsersResponse;
+import com.esm.alumniforum.user.dto.*;
 import com.esm.alumniforum.user.service.interfa.UsersService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -35,7 +33,6 @@ public class UsersController {
    public ResponseEntity<?> create(@Valid @RequestBody UsersForm form, BindingResult bindingResult, @CurrentUser UserPrincipal principal){
         try {
             if (!Objects.equals(form.getPassword(), form.getPassword2())) {
-//                BadRequestException ex = new BadRequestException("Confirm Password must match password");
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequestException("Confirm Password must match password").getApiResponse());
             }
             if (bindingResult.hasErrors()) {
@@ -52,9 +49,42 @@ public class UsersController {
         }catch (UnauthorizedException ex){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getApiResponse());
         }
-
-
 }
+    @PostMapping("create/memberuser")
+    public ResponseEntity<?> memberToUser(@Valid @RequestBody MemberToUserForm form, BindingResult bindingResult, @CurrentUser UserPrincipal principal){
+        try {
+            if (!Objects.equals(form.getPassword(), form.getPassword2())) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new BadRequestException("Confirm Password must match password").getApiResponse());
+            }
+            if (bindingResult.hasErrors()) {
+                Map<String, String> errors = new HashMap<>();
+                bindingResult.getFieldErrors().forEach(error -> {
+                    errors.put(error.getField(), error.getDefaultMessage());
+                });
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+            }
+            UsersResponse response = this.usersService.memberToUser(form, principal);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (BadRequestException ex){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getApiResponse());
+        }catch (UnauthorizedException ex){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getApiResponse());
+        }
+    }
+
+    @PostMapping("create/usermember")
+    public ResponseEntity<?> userToMember(@Valid @RequestBody UserToMemberForm form, @CurrentUser UserPrincipal principal){
+
+            MemberResponse response = this.usersService.userToMember(form, principal.getEmail());
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+
+    }
+
+//    @PostMapping("create/member")
+//    public ResponseEntity<?> userToMyMember(@Valid @RequestBody UserToMemberForm form, @CurrentUser UserPrincipal principal){
+//        MemberResponse response = this.usersService.userToMyMember(form, principal);
+//        return new ResponseEntity<>(response, HttpStatus.CREATED);
+//    }
 
     @PostMapping("update")
     public ResponseEntity<?> update(@RequestBody ProfileForm form){
