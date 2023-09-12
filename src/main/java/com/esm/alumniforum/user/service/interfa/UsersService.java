@@ -23,5 +23,4 @@ public interface UsersService {
 
     UsersResponse memberToUser(MemberToUserForm form, UserPrincipal principal);
 
-//    MemberResponse userToMyMember(UserToMemberForm form, UserPrincipal principal);
 }
