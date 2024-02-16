@@ -26,14 +26,14 @@ public class ConstitutionController {
 
     @PostMapping("create")
     @PreAuthorize("isAuthenticated()")
-   public ResponseEntity<ConstitutionResponse> create(@RequestBody ConstitutionForm constitutionForm, @CurrentUser UserPrincipal principal) throws IOException {
+   public ResponseEntity<ConstitutionResponse> create(ConstitutionForm constitutionForm, @CurrentUser UserPrincipal principal) throws IOException {
 
     return new ResponseEntity<>(this.constitutionService.save(constitutionForm, principal), HttpStatus.CREATED);
 }
 
     @PostMapping("update")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> update(@RequestBody ConstitutionForm constitutionForm, @CurrentUser UserPrincipal principal) throws IOException {
+    public ResponseEntity<?> update( ConstitutionForm constitutionForm, @CurrentUser UserPrincipal principal) throws IOException {
 
         return new ResponseEntity<>(this.constitutionService.update(constitutionForm, principal), HttpStatus.OK);
     }

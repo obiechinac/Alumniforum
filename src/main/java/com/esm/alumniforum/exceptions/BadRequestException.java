@@ -1,10 +1,12 @@
 package com.esm.alumniforum.exceptions;
 
 import com.esm.alumniforum.common.response.ApiResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 //@ResponseStatus(value = HttpStatus.BAD_REQUEST)
+@RequiredArgsConstructor
 public class BadRequestException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 
@@ -13,7 +15,10 @@ public class BadRequestException extends RuntimeException {
     public BadRequestException(String message) {
         this.message = String.valueOf(message);
     }
-
+    public BadRequestException(ApiResponse apiResponse) {
+        super();
+        this.apiResponse = apiResponse;
+    }
     public String getMessage() {
         return message;
     }

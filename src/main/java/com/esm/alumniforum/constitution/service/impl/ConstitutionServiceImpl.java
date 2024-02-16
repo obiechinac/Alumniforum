@@ -44,8 +44,11 @@ public class ConstitutionServiceImpl implements ConstitutionService {
         constitution.setCreatedBy(principal.getEmail());
         Constitution savedCon = this.constitutionRepository.save(constitution);
         return ConstitutionResponse.builder()
+                .orgId(savedCon.getOrganisation().getId())
+                .orgName(savedCon.getOrganisation().getOrgName())
                 .createdDate(savedCon.getCreatedDate())
                 .description(savedCon.getDescription())
+                .id(savedCon.getId())
                 .file(savedCon.getFile())
                 .build();
     }
@@ -66,6 +69,10 @@ public class ConstitutionServiceImpl implements ConstitutionService {
                 .createdDate(savedCon.getCreatedDate())
                 .description(savedCon.getDescription())
                 .file(savedCon.getFile())
+                .orgId(organisation.getId())
+                .id(savedCon.getId())
+                .orgName(organisation.getOrgName())
+
                 .build();
     }
 
@@ -82,14 +89,27 @@ public class ConstitutionServiceImpl implements ConstitutionService {
         constitution.setModifiedDate(LocalDate.now());
         constitution.setModifiedBy(principal.getEmail());
         Constitution savedCon = this.constitutionRepository.save(constitution);
-      return modelMapper.map(savedCon,ConstitutionResponse.class);
+      return ConstitutionResponse.builder()
+              .orgId(savedCon.getOrganisation().getId())
+              .orgName(savedCon.getOrganisation().getOrgName())
+              .createdDate(savedCon.getCreatedDate())
+              .description(savedCon.getDescription())
+              .id(savedCon.getId())
+              .file(savedCon.getFile())
+              .build();
     }
 
     @Override
     public ConstitutionResponse findById(String id) {
         Constitution constitution = this.constitutionRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException(MSG,"id", id));
-        ModelMapper modelMapper= new ModelMapper();
-      return modelMapper.map(constitution,ConstitutionResponse.class);
+      return ConstitutionResponse.builder()
+              .orgId(constitution.getOrganisation().getId())
+              .orgName(constitution.getOrganisation().getOrgName())
+              .createdDate(constitution.getCreatedDate())
+              .description(constitution.getDescription())
+              .id(constitution.getId())
+              .file(constitution.getFile())
+              .build();
 
     }
 
@@ -112,7 +132,14 @@ public class ConstitutionServiceImpl implements ConstitutionService {
 
         List<Constitution> cons = this.constitutionRepository.findAllByOrg(orgId);
         List<ConstitutionResponse> responses = new ArrayList<>();
-        cons.forEach(con-> responses.add(new ModelMapper().map(con, ConstitutionResponse.class)));
+        cons.forEach(con-> responses.add(ConstitutionResponse.builder()
+                .orgId(con.getOrganisation().getId())
+                .orgName(con.getOrganisation().getOrgName())
+                .createdDate(con.getCreatedDate())
+                .description(con.getDescription())
+                .id(con.getId())
+                .file(con.getFile())
+                .build()));
         return responses;
     }
     @Override
@@ -121,7 +148,14 @@ public class ConstitutionServiceImpl implements ConstitutionService {
         List<Constitution> cons = this.constitutionRepository.findAllByMyOrg(orgId);
         List<ConstitutionResponse> responses = new ArrayList<>();
         cons.forEach(con->
-            responses.add(new ModelMapper().map(con, ConstitutionResponse.class)));
+            responses.add(  ConstitutionResponse.builder()
+                .createdDate(con.getCreatedDate())
+                .description(con.getDescription())
+                .file(con.getFile())
+                            .id(con.getId())
+                            .orgName(con.getOrganisation().getOrgName())
+                            .orgId(con.getOrganisation().getId())
+                .build()));
         return responses;
     }
 
@@ -137,7 +171,14 @@ if(constitutions.isEmpty()){
 
     constitutions.forEach(con->{
         try {
-            responses.add(mapper.map(con, ConstitutionResponse.class));
+            responses.add(ConstitutionResponse.builder()
+                    .orgId(con.getOrganisation().getId())
+                    .orgName(con.getOrganisation().getOrgName())
+                    .createdDate(con.getCreatedDate())
+                    .description(con.getDescription())
+                    .id(con.getId())
+                    .file(con.getFile())
+                    .build());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
